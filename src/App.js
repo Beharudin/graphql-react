@@ -64,9 +64,9 @@ function App() {
   const loginHandler = (event, authData) => {
     event.preventDefault();
     setAuthLoading(true);
-
-    const email = authData.loginForm.email.value;
-    const password = authData.loginForm.password.value;
+    console.log(authData);
+    const email = authData.email;
+    const password = authData.password;
 
     const graphqlQuery = {
       query: `{
@@ -74,9 +74,13 @@ function App() {
         userId, token
         }   
       }`,
+      // variables: {
+      //   email: authData.email,
+      //   password: authData.password,
+      // },
     };
 
-    fetch("http://localhost:8080/auth/login", {
+    fetch("http://localhost:8080/graphql", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -34,20 +34,47 @@ function Feed({ token, userId }) {
       page--;
       setPostPage(page);
     }
-    fetch("http://localhost:8080/feed/posts?page=" + page, {
+
+    const graphqlQuery = {
+      query: `
+        query FetchPosts($page: Int) {
+          posts(page: $page) {
+            posts {
+              _id
+              title
+              content
+              imageUrl
+              creator {
+                name
+              }
+              createdAt
+            }
+            totalPosts
+          }
+        }
+      `,
+      // variables: {
+      //   page: page,
+      // },
+    };
+
+    fetch('http://localhost:8080/graphql', {
+      method: 'POST',
       headers: {
-        Authorization: "Bearer " + token,
+        Authorization: 'Bearer ' + token,
+        'Content-Type': 'application/json'
       },
+      body: JSON.stringify(graphqlQuery)
     })
       .then((res) => {
-        if (res.status !== 200) {
-          throw new Error("Failed to fetch posts.");
-        }
         return res.json();
       })
       .then((resData) => {
+        if (resData.errors) {
+          throw new Error('Fetching posts failed!');
+        }
         setPosts(
-          resData.posts.map((post) => {
+          resData.data.posts.posts.map((post) => {
             return {
               ...post,
               imagePath: post.imageUrl,
@@ -163,7 +190,9 @@ function Feed({ token, userId }) {
         setPosts((prevPosts) => {
           const updatedPosts = [...prevPosts];
           if (editPost) {
-            const postIndex = prevPosts.findIndex((p) => p._id === editPost._id);
+            const postIndex = prevPosts.findIndex(
+              (p) => p._id === editPost._id,
+            );
             if (postIndex !== -1) {
               updatedPosts[postIndex] = post;
             }
