@@ -37,8 +37,8 @@ function Feed({ token, userId }) {
 
     const graphqlQuery = {
       query: `
-        query FetchPosts($page: Int) {
-          posts(page: $page) {
+        {
+          posts(page: ${page}) {
             posts {
               _id
               title
@@ -81,7 +81,7 @@ function Feed({ token, userId }) {
             };
           }),
         );
-        setTotalPosts(resData.totalItems);
+        setTotalPosts(resData.data.posts.totalPosts);
         setPostsLoading(false);
       })
       .catch(catchError);
@@ -136,7 +136,7 @@ function Feed({ token, userId }) {
     let graphqlQuery = {
       query: `
           mutation {
-            createPost(postInput: {title: $title, content: $content, imageUrl: $imageUrl}) {
+            createPost(postInput: {title: "${postData.title}", content: "${postData.content}", imageUrl: "${postData.image}" }) {
               _id
               title
               content
