@@ -37,8 +37,8 @@ function Feed({ token, userId }) {
 
     const graphqlQuery = {
       query: `
-        {
-          posts(page: ${page}) {
+        query fetchPosts($page: Int) {
+          posts(page: $page) {
             posts {
               _id
               title
@@ -53,9 +53,9 @@ function Feed({ token, userId }) {
           }
         }
       `,
-      // variables: {
-      //   page: page,
-      // },
+      variables: {
+        page,
+      },
     };
 
     fetch("http://localhost:8080/graphql", {
@@ -91,15 +91,15 @@ function Feed({ token, userId }) {
     event.preventDefault();
     const graphqlQuery = {
       query: `
-        mutation {
-          updateStatus(status: "${status}") {
+        mutation updateUserStatus($userStatus: String!) {
+          updateStatus(status: $userStatus) {
             status
           }
         }
       `,
-      // variables: {
-      //   userStatus: status,
-      // },
+      variables: {
+        userStatus: status,
+      },
     };
     fetch("http://localhost:8080/graphql", {
       method: "POST",
@@ -158,8 +158,8 @@ function Feed({ token, userId }) {
 
         let graphqlQuery = {
           query: `
-          mutation {
-            createPost(postInput: {title: "${postData.title}", content: "${postData.content}", imageUrl: "${imageUrl}" }) {
+          mutation createPost($title: String!, $content: String!, $imageUrl: String!) {
+            createPost(postInput: {title: $title, content: $content, imageUrl: $imageUrl }) {
               _id
               title
               content
@@ -171,20 +171,18 @@ function Feed({ token, userId }) {
             }
           }
         `,
-          // ,
-          //   variables: {
-          //     title: postData.title,
-          //     content: postData.content,
-          //     imageUrl: imageUrl
-          //   }
+            variables: {
+              title: postData.title,
+              content: postData.content,
+              imageUrl: imageUrl
+            }
         };
 
         if (editPost) {
-          const postId = editPost._id;
           graphqlQuery = {
             query: `
-              mutation {
-                updatePost(id: "${postId}", postInput: {title: "${postData.title}", content: "${postData.content}", imageUrl: "${imageUrl}" }) {
+              mutation updatePost($postId: ID!, $title: String!, $content: String!, $imageUrl: String!) {
+                updatePost(id: $postId, postInput: {title: $title, content: $content, imageUrl: $imageUrl }) {
                   _id
                   title
                   content
@@ -196,12 +194,12 @@ function Feed({ token, userId }) {
                 }
               }
             `,
-            // variables: {
-            //   postId: this.state.editPost._id,
-            //   title: postData.title,
-            //   content: postData.content,
-            //   imageUrl: imageUrl
-            // }
+            variables: {
+              postId: editPost._id,
+              title: postData.title,
+              content: postData.content,
+              imageUrl: imageUrl
+            }
           };
         }
 
