@@ -171,11 +171,11 @@ function Feed({ token, userId }) {
             }
           }
         `,
-            variables: {
-              title: postData.title,
-              content: postData.content,
-              imageUrl: imageUrl
-            }
+          variables: {
+            title: postData.title,
+            content: postData.content,
+            imageUrl: imageUrl,
+          },
         };
 
         if (editPost) {
@@ -198,8 +198,8 @@ function Feed({ token, userId }) {
               postId: editPost._id,
               title: postData.title,
               content: postData.content,
-              imageUrl: imageUrl
-            }
+              imageUrl: imageUrl,
+            },
           };
         }
 
@@ -237,6 +237,8 @@ function Feed({ token, userId }) {
 
         setPosts((prevPosts) => {
           const updatedPosts = [...prevPosts];
+          let updatedTotalPosts = prevState.totalPosts;
+
           if (editPost) {
             const postIndex = prevPosts.findIndex(
               (p) => p._id === editPost._id,
@@ -245,6 +247,7 @@ function Feed({ token, userId }) {
               updatedPosts[postIndex] = post;
             }
           } else {
+            updatedTotalPosts++;
             if (prevPosts.length >= 2) {
               updatedPosts.pop();
             }
@@ -260,6 +263,7 @@ function Feed({ token, userId }) {
         setIsEditing(false);
         setEditPost(null);
         setEditLoading(false);
+        setTotalPosts(updatedTotalPosts);
       })
       .catch((err) => {
         console.log(err);
